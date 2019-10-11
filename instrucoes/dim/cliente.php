@@ -5,7 +5,7 @@ namespace dimensoes;
 
 /**
  * Model da entidade cliente
- * @author Phellip Bonavigo
+ * @author Bruno do Amaral
  * 
  * 
  */
@@ -16,7 +16,6 @@ public $cpf;
 public $nome;
 public $sexo;
 public $idade;
-public $email;
 public $rua;
 public $bairro;
 public $cidade;
@@ -37,11 +36,12 @@ public $uf;
  * @return Void
  */
 
-public function setCliente($cpf,$nome,$sexo,$idade,$email,$rua,$bairro,$cidade,$uf){
+public function setCliente($cpf,$nome,$sexo,$idade,$rua,$bairro,$cidade,$uf){
 
     $this->cpf= $cpf; 
     $this->nome= $nome; 
     $this->sexo= $sexo; 
+    $this->idade= $idade;
     $this->rua= $rua; 
     $this->bairro= $bairro;
     $this->cidade= $cidade;
