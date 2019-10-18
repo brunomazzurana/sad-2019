@@ -5,5 +5,6 @@ use dimensoes\DimCliente;
 
 $dimCliente = new DimCliente();
 $sumCliente = $dimCliente->carregarDimCliente();
-echo $sumCliente->quantidadeInclusoes;
+echo "Quantidade de inclusoes:".$sumCliente->quantidadeInclusoes."<br>";
+echo "Quantidade de Alterações:".$sumCliente->quantidadeAlteracoes;
 ?>
