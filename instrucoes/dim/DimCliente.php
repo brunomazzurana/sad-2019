@@ -41,11 +41,7 @@ class DimCliente{
                     $sqlInsertDim->execute();
                     $sumario->setQuantidadeInclusoes();
                 } 
-                $sqlComercial->close();
-                $sqlDim->close();
-                $sqlInsertDim->close();
-                $connComercial->close();
-                $connDimensao->close();                                           
+                                                    
             }
         }else{//dimensao já contem dados
             $sqlComercial = $connComercial->prepare('select*from cliente');
@@ -54,46 +50,44 @@ class DimCliente{
 
             while($linhaComercial = $resultComercial->fetch_assoc()){
                 $sqlDim = $connDimensao->prepare('SELECT SK_cliente, nome, cpf, nome, cpf, sexo, idade, rua, bairro, cidade, uf from dim_cliente 
-                WHERE cpf = ? and data_ini is null');
+                WHERE cpf = ? and data_fim is null');
                 $sqlDim->bind_param('s', $linhaComercial['cpf']);
                 $sqlDim->execute();
 
                 $resultDim = $sqlDim->get_result();
 
                 if($resultDim->num_rows === 0){// O cliente da  Comercial não está na Dimensional
-                    $sqlInsertDim = $connDimensao->prepare('INSERT INTO  dim_cliente (cpf, nome, sexo, idade, rua, bairro, cidade, uf, data_ini VALUES (?,?,?,?,?,?,?,?,?)');
-                    $sqlInsertDim->bind_param('sssisssss', $linhaComercial['cpf'],$linhaComercial['nome'],$linhaComercial['sexo'],$linhaComercial['idade'],
+                    $sqlInsertDim = $connDimensao->prepare('INSERT INTO  dim_cliente (cpf, nome, sexo, idade, rua, bairro, cidade, uf, data_ini) VALUES (?,?,?,?,?,?,?,?,?)');
+
+                    $sqlInsertDim->bind_param('sssisssss',$linhaComercial['cpf'],$linhaComercial['nome'],$linhaComercial['sexo'],$linhaComercial['idade'],
                     $linhaComercial['rua'],$linhaComercial['bairro'],$linhaComercial['cidade'],$linhaComercial['uf'],$dataAtual);
+
                     $sqlInsertDim->execute();
                     if($sqlInsertDim->error){
                         throw new \Exception('Erro: Cliente novo não incluso');
                     }
+
                     $sumario->setQuantidadeInclusoes();
 
-                    $sqlComercial->close();
-                    $sqlDim->close();
-                    $sqlInsertDim->close();
-                    $connDimensao->close();
-                    $connComercial->close();
                 }else{// O cliente da  Comercial já está na Dimensional
                     $strComercialTeste = $linhaComercial['cpf'].$linhaComercial['nome'].$linhaComercial['sexo'].$linhaComercial['idade'].$linhaComercial['rua'].
                     $linhaComercial['bairro'].$linhaComercial['cidade'].$linhaComercial['uf'];
 
                     $linhaDim = $resultDim->fetch_assoc();
                     $strDimensionalTeste = $linhaDim['cpf'].$linhaDim['nome'].$linhaDim['sexo'].$linhaDim['idade'].$linhaDim['rua'].
-                    $linhaDim['bairro'].$linhaDim['cidade'].$$linhaDim['uf'];
+                    $linhaDim['bairro'].$linhaDim['cidade'].$linhaDim['uf'];
 
                     if(!$this->strIgual($strComercialTeste, $strDimensionalTeste)){
                         $sqlUpdateDim = $connDimensao->prepare('UPDATE dim_cliente SET data_fim = ? WHERE SK_cliente = ?');
                         $sqlUpdateDim->bind_param('si', $dataAtual, $linhaDim['SK_cliente']);
-                        $sqlUpdateDIm->execute();
+                        $sqlUpdateDim->execute();
                         if(!$sqlUpdateDim->error){
-                            $sqlInsertDim = $connComercial->prepare('INSERT INTO  dim_cliente (cpf, nome, sexo, idade, rua, bairro, cidade, uf, data_ini VALUES (?,?,?,?,?,?,?,?,?)');
+                            $sqlInsertDim = $connDimensao->prepare('INSERT INTO  dim_cliente (cpf, nome, sexo, idade, rua, bairro, cidade, uf, data_ini) VALUES (?,?,?,?,?,?,?,?,?)');
                             $sqlInsertDim->bind_param('sssisssss', $linhaComercial['cpf'],$linhaComercial['nome'],$linhaComercial['sexo'],$linhaComercial['idade'],
                             $linhaComercial['rua'],$linhaComercial['bairro'],$linhaComercial['cidade'],$linhaComercial['uf'],$dataAtual);
                             $sqlInsertDim->execute();
                             $sumario->setQuantidadeAlteracoes();
-                        }
+                        
                     }else{
                         throw new \EXCEPTION('Erro: Erro no processo de alteração!');
 
@@ -101,12 +95,13 @@ class DimCliente{
                 }
             }
         }
+    }
    
         return $sumario;
     }
     private function strIgual($strAtual, $strNova){
         $hashAtual = md5($strAtual);
-        $hashNovo = md5($strNovo);
+        $hashNovo = md5($strNova);
         if($hashAtual === $hashNovo){
             return TRUE;
         }else{

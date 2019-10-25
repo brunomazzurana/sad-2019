@@ -1,5 +1,7 @@
 <?php
+
 namespace dimensoes;
+
 class Sumario {
     public $quantidadeInclusoes;
     public $quantidadeAlteracoes;
@@ -8,7 +10,7 @@ class Sumario {
         $this->quantidadeInclusoes ++;
     }
     public function setQuantidadeAlteracoes(){
-        $this->setQuantidadeAlteracoes ++;
+        $this->quantidadeAlteracoes ++;
     }
 } 
 
